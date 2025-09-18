@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>EcoMap AI — Мониторинг H₂S и усталости</title>
+
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../style/style.css">
+
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin="anonymous">
+  <script defer src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin="anonymous"></script>
+
+  <script defer src="../server/script.js"></script>
+</head>
+<body>
+  <header class="top-menu">
+    <div class="menu-container">
+      <div class="logo">EA</div>
+      <nav class="nav-menu" role="navigation" aria-label="Главное меню">
+        <button class="menu-btn active" data-page="devices">Устройства</button>
+        <button class="menu-btn" data-page="map">Карта</button>
+        <button class="menu-btn" data-page="stats">Статистика</button>
+        <button class="menu-btn" data-page="about">О проекте</button>
+        <button class="menu-btn" data-page="settings">Настройки</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="main-content container">
+    <!-- Устройства -->
+    <section id="devices" class="page active">
+      <h2>Список работников</h2>
+
+      <div class="table-wrap card">
+        <table class="tbl" aria-describedby="legend">
+          <thead>
+            <tr>
+              <th>Работник / Устройство</th>
+              <th>H₂S (ppm)</th>
+              <th>Статус</th>
+              <th>Часы</th>
+              <th>Нагрузка</th>
+            </tr>
+          </thead>
+          <tbody id="workers-body"></tbody>
+        </table>
+      </div>
+
+      <!-- Форма добавления устройства -->
+      <div class="card add-device">
+        <h3>Добавить устройство</h3>
+        <div class="add-row">
+          <input id="add-name" placeholder="Имя (например: НИШ ЕСП РКНП)" />
+          <input id="add-h2s" placeholder="H₂S (ppm)" type="number" />
+          <input id="add-hours" placeholder="Часы (число)" type="number" />
+          <input id="add-lat" placeholder="Широта (lat)" type="number" step="any" />
+          <input id="add-lng" placeholder="Долгота (lng)" type="number" step="any" />
+          <button id="add-device-btn" class="btn">Добавить</button>
+        </div>
+        <p class="muted">Координаты обязательны для отображения на карте. Можно добавить одно устройство.</p>
+      </div>
+    </section>
+
+    <!-- Карта -->
+    <section id="map" class="page">
+      <h2>Карта мониторинга</h2>
+      <div id="mapView" class="map card" aria-label="Карта расположения"></div>
+      <div class="map-legend card">
+        <div class="legend-row">
+          <span class="marker-key key-safe"></span><span>Безопасно</span>
+          <span class="marker-key key-level1"></span><span>Уровень 1</span>
+          <span class="marker-key key-level2"></span><span>Уровень 2</span>
+          <span class="marker-key key-level3"></span><span>Уровень 3</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- О проекте -->
+    <section id="about" class="page">
+      <h2>О концепции</h2>
+      <div class="card">
+        <p>
+          3-ступенчатая система безопасности для нефтерабочих — носимый шлем с H₂S, датчиками усталости и GPS.
+          Сервер оценивает риск и показывает цветовую индикацию по уровням: Норма / Уровень 1 / Уровень 2 / Уровень 3.
+        </p>
+      </div>
+    </section>
+
+    <!-- Статистика -->
+    <section id="stats" class="page">
+      <h2>Статистика</h2>
+      <div class="card">
+        <p>Статистика будет здесь — по неделям, дням, с выбором даты.</p>
+      </div>
+    </section>
+
+    <!-- Настройки -->
+    <section id="settings" class="page">
+      <h2>Настройки</h2>
+      <div class="card">
+        <p>Настройки и управление аккаунтами (серверная часть подключается позже).</p>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-inner">
+      <span>© EcoMap AI</span>
+    </div>
+  </footer>
+</body>
+</html>
