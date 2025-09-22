@@ -1,19 +1,8 @@
-// ==== Данные (одно устройство по умолчанию) ====
-const devices = [
-  {
-    id: 1,
-    name: "НИШ ЕСП РКНП",
-    h2s: 5,
-    hours: 5,
-    load: 60,
-    lat: 43.68658,
-    lng: 51.15648
-  }
-];
+// ==== Глобальный массив устройств ====
+let devices = [];
 
 // ==== Функция — статус по H2S ====
 function computeStatus(h2s) {
-  // Возвращаем поля: текст, класс текста, класс строки, цвет (hex / css var)
   if (h2s <= 10) return { text: "Норма", textClass: "text-safe", rowClass: "row-safe", color: "var(--safe)" };
   if (h2s <= 20) return { text: "Уровень 1", textClass: "text-level1", rowClass: "row-level1", color: "var(--level1)" };
   if (h2s <= 30) return { text: "Уровень 2", textClass: "text-level2", rowClass: "row-level2", color: "var(--level2)" };
@@ -31,9 +20,8 @@ menuButtons.forEach(btn => {
     const target = btn.dataset.page;
     document.getElementById(target)?.classList.add('active');
     if (target === 'map' && map) {
-  setTimeout(() => map.invalidateSize(), 200);
-}
-
+      setTimeout(() => map.invalidateSize(), 200);
+    }
   });
 });
 
@@ -43,15 +31,26 @@ let markersLayer = null;
 
 function initMap() {
   const el = document.getElementById('mapView');
-  if (!el || map) return; // если карта уже есть — не пересоздаём
+  if (!el || map) return;
 
-  map = L.map('mapView').setView([devices[0].lat, devices[0].lng], 13);
+  map = L.map('mapView').setView([43.68658, 51.15648], 13);
   L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
     attribution: '&copy; OpenStreetMap contributors'
   }).addTo(map);
   markersLayer = L.layerGroup().addTo(map);
 }
 
+// ==== Получение данных с сервера ====
+async function fetchDevices() {
+  try {
+    const res = await fetch("http://localhost:8000/devices"); // твой API
+    if (!res.ok) throw new Error("Ошибка сети");
+    devices = await res.json();
+    renderAll();
+  } catch (err) {
+    console.error("Не удалось получить данные с сервера:", err);
+  }
+}
 
 // ==== Рендер таблицы и маркеров ====
 function renderAll() {
@@ -61,10 +60,7 @@ function renderAll() {
 
 function renderTable() {
   const tbody = document.getElementById('workers-body');
-  if (!tbody) {
-    console.error('workers-body не найден в DOM');
-    return;
-  }
+  if (!tbody) return;
   tbody.innerHTML = '';
   devices.forEach(d => {
     const st = computeStatus(d.h2s);
@@ -74,23 +70,16 @@ function renderTable() {
       <td class="device-name" data-id="${d.id}">${escapeHtml(d.name)}</td>
       <td>${escapeHtml(String(d.h2s))}</td>
       <td><span class="status-indicator" style="background:${st.color}"></span><span class="${st.textClass}">${st.text}</span></td>
-      <td>${escapeHtml(String(d.hours))}</td>
-      <td>${escapeHtml(String(d.load))}%</td>
+      <td>${escapeHtml(String(d.hours || 0))}</td>
+      <td>${escapeHtml(String(d.load || 0))}%</td>
     `;
     tbody.appendChild(tr);
-  });
 
-  // ==== Удаление по тройному клику ====
-  tbody.querySelectorAll(".device-name").forEach(cell => {
-    cell.addEventListener("click", e => {
-      if (e.detail === 3) { // именно тройной клик
-        const id = parseInt(e.target.dataset.id);
-        // фильтруем массив
-        const idx = devices.findIndex(dev => dev.id === id);
-        if (idx !== -1) {
-          devices.splice(idx, 1);
-        }
-        renderAll(); // перерисовываем список и маркеры
+    // ==== Удаление по тройному клику ====
+    tr.querySelector(".device-name").addEventListener("click", e => {
+      if (e.detail === 3) {
+        devices = devices.filter(dev => dev.id !== d.id);
+        renderAll();
       }
     });
   });
@@ -104,7 +93,7 @@ function renderMarkers() {
       const st = computeStatus(d.h2s);
       const marker = L.circleMarker([d.lat, d.lng], {
         radius: 8,
-        fillColor: getComputedStyle(document.documentElement).getPropertyValue(st.color) ? getComputedStyle(document.documentElement).getPropertyValue(st.color).trim() : st.color,
+        fillColor: getComputedStyle(document.documentElement).getPropertyValue(st.color) || st.color,
         color: '#000',
         weight: 1,
         fillOpacity: 0.9
@@ -115,50 +104,14 @@ function renderMarkers() {
   });
 }
 
-// ==== Утилиты ====
+// ==== Утилита для экранирования ====
 function escapeHtml(str) {
   return String(str).replace(/[&<>"'`]/g, s => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;',"`":'&#96;'}[s]));
-}
-
-// ==== Обработчик формы добавления устройства ====
-function setupAddForm() {
-  const btn = document.getElementById('add-device-btn');
-  if (!btn) return;
-  btn.addEventListener('click', (e) => {
-    e.preventDefault();
-    const name = document.getElementById('add-name').value.trim();
-    const h2s = parseFloat(document.getElementById('add-h2s').value);
-    const hours = parseFloat(document.getElementById('add-hours').value) || 0;
-    const lat = parseFloat(document.getElementById('add-lat').value);
-    const lng = parseFloat(document.getElementById('add-lng').value);
-
-    if (!name) { alert('Укажи имя устройства'); return; }
-    if (Number.isNaN(h2s)) { alert('Укажи корректное значение H₂S (ppm)'); return; }
-    if (Number.isNaN(lat) || Number.isNaN(lng)) { alert('Координаты обязательны (lat, lng)'); return; }
-
-    const newId = devices.length ? Math.max(...devices.map(x => x.id || 0)) + 1 : 1;
-    const obj = { id: newId, name, h2s, hours, load: 0, lat, lng };
-    devices.push(obj);
-
-    // очистка полей
-    document.getElementById('add-name').value = '';
-    document.getElementById('add-h2s').value = '';
-    document.getElementById('add-hours').value = '';
-    document.getElementById('add-lat').value = '';
-    document.getElementById('add-lng').value = '';
-
-    renderAll();
-    // переключаемся на список, чтобы видеть добавленное
-    document.querySelectorAll('.menu-btn').forEach(b => b.classList.remove('active'));
-    document.querySelector('.menu-btn[data-page="devices"]').classList.add('active');
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById('devices').classList.add('active');
-  });
 }
 
 // ==== Инициализация страницы ====
 document.addEventListener('DOMContentLoaded', () => {
   initMap();
-  setupAddForm();
-  renderAll();
+  fetchDevices();
+  setInterval(fetchDevices, 2000); // автообновление
 });
