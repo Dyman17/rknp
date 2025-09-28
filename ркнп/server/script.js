@@ -6,8 +6,8 @@ let devices = [
     h2s: 8,
     hours: 3,
     load: 40,
-    lat: 43.6875,
-    lng: 51.1550
+    lat: 43.68649 ,
+    lng: 51.15596 
   },
   {
     id: 2,
@@ -15,17 +15,17 @@ let devices = [
     h2s: 15,
     hours: 5,
     load: 65,
-    lat: 43.6850,
-    lng: 51.1600
+    lat: 43.68628 ,
+    lng: 51.15679 
   },
   {
     id: 3,
-    name: "Аскар",
-    h2s: 28,
+    name: "Айгерим апай",
+    h2s: 49,
     hours: 7,
-    load: 80,
-    lat: 43.6890,
-    lng: 51.1580
+    load: 90,
+    lat: 43.64288 ,
+    lng: 51.16636 
   }
 ];
 
@@ -142,5 +142,6 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchDevices();
   setInterval(fetchDevices, 2000); // автообновление
 });
+
 
 
