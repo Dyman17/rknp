@@ -2,7 +2,7 @@
 let devices = [
   {
     id: 1,
-    name: "Айдар",
+    name: "Думан",
     h2s: 8,
     hours: 3,
     load: 40,
@@ -11,7 +11,7 @@ let devices = [
   },
   {
     id: 2,
-    name: "Марат",
+    name: "Бектур",
     h2s: 15,
     hours: 5,
     load: 65,
@@ -142,6 +142,7 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchDevices();
   setInterval(fetchDevices, 2000); // автообновление
 });
+
 
 
 
