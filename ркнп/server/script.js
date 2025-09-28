@@ -41,14 +41,43 @@ function initMap() {
 }
 
 // ==== Получение данных с сервера ====
+// ==== Получение данных с сервера или фейковых ====
 async function fetchDevices() {
   try {
-    const res = await fetch("http://localhost:8000/devices"); // твой API
-    if (!res.ok) throw new Error("Ошибка сети");
-    devices = await res.json();
+    // ==== Твои данные тут ====
+    devices = [
+      {
+        id: 1,
+        name: "Айдар",
+        h2s: 8,     // ppm
+        hours: 3,   // часы работы
+        load: 40,   // %
+        lat: 43.6875,
+        lng: 51.1550
+      },
+      {
+        id: 2,
+        name: "Марат",
+        h2s: 15,
+        hours: 5,
+        load: 65,
+        lat: 43.6850,
+        lng: 51.1600
+      },
+      {
+        id: 3,
+        name: "Аскар",
+        h2s: 28,
+        hours: 7,
+        load: 80,
+        lat: 43.6890,
+        lng: 51.1580
+      }
+    ];
+
     renderAll();
   } catch (err) {
-    console.error("Не удалось получить данные с сервера:", err);
+    console.error("Ошибка:", err);
   }
 }
 
@@ -115,3 +144,4 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchDevices();
   setInterval(fetchDevices, 2000); // автообновление
 });
+
