@@ -1,5 +1,33 @@
 // ==== Глобальный массив устройств ====
-let devices = [];
+let devices = [
+  {
+    id: 1,
+    name: "Айдар",
+    h2s: 8,
+    hours: 3,
+    load: 40,
+    lat: 43.6875,
+    lng: 51.1550
+  },
+  {
+    id: 2,
+    name: "Марат",
+    h2s: 15,
+    hours: 5,
+    load: 65,
+    lat: 43.6850,
+    lng: 51.1600
+  },
+  {
+    id: 3,
+    name: "Аскар",
+    h2s: 28,
+    hours: 7,
+    load: 80,
+    lat: 43.6890,
+    lng: 51.1580
+  }
+];
 
 // ==== Функция — статус по H2S ====
 function computeStatus(h2s) {
@@ -44,43 +72,13 @@ function initMap() {
 // ==== Получение данных с сервера или фейковых ====
 async function fetchDevices() {
   try {
-    // ==== Твои данные тут ====
-    devices = [
-      {
-        id: 1,
-        name: "Айдар",
-        h2s: 8,     // ppm
-        hours: 3,   // часы работы
-        load: 40,   // %
-        lat: 43.6875,
-        lng: 51.1550
-      },
-      {
-        id: 2,
-        name: "Марат",
-        h2s: 15,
-        hours: 5,
-        load: 65,
-        lat: 43.6850,
-        lng: 51.1600
-      },
-      {
-        id: 3,
-        name: "Аскар",
-        h2s: 28,
-        hours: 7,
-        load: 80,
-        lat: 43.6890,
-        lng: 51.1580
-      }
-    ];
-
+    // Если сервер есть, можно тут делать fetch(...)
+    // А пока просто перерисовываем существующий массив
     renderAll();
   } catch (err) {
     console.error("Ошибка:", err);
   }
 }
-
 // ==== Рендер таблицы и маркеров ====
 function renderAll() {
   renderTable();
@@ -144,4 +142,5 @@ document.addEventListener('DOMContentLoaded', () => {
   fetchDevices();
   setInterval(fetchDevices, 2000); // автообновление
 });
+
 
